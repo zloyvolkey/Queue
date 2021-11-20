@@ -183,7 +183,7 @@ int8_t queue_get_internal(queue_t *q, void **e, int (*action)(pthread_cond_t *, 
 	
 	// get first element (which fulfills the requirements)
 	queue_element_t *el_prev = NULL, *el = q->first_el;
-	while(cmp != NULL && el != NULL && 0 != cmp(el, cmpel)) {
+	while(cmp != NULL && el != NULL && 0 != cmp(el->data, cmpel)) {
 		el_prev = el;
 		el = el->next;
 	}
