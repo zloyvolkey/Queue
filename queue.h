@@ -285,6 +285,7 @@ uint8_t queue_get_new_data(queue_t *q);
  * @param headRef first element
  * @param cmp compare func
  */
+void queue_sort(queue_t * q, int (*cmp)(void *, void *));
 void queue_merge_sort(queue_element_t** headRef, int (*cmp)(void *, void *));
 
 #endif /* __QUEUE_H__ */

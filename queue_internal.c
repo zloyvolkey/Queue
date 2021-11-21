@@ -200,6 +200,9 @@ int8_t queue_get_internal(queue_t *q, void **e, int (*action)(pthread_cond_t *, 
 		// element in the middle is removed
 		el_prev->next = el->next;
 		q->num_els--;
+		if(el->next == NULL){
+			q->last_el = el_prev;
+		}
 		*e = el->data;
 		free(el);
 	} else {

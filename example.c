@@ -92,7 +92,7 @@ void sorted_mode_merge() {
 	queue_put(q, t3);
 	queue_put(q, t4);
 
-	queue_merge_sort(&q->first_el,  (int (*)(void *, void *))cmp_sell_orders);
+	queue_merge_sort(q,  (int (*)(void *, void *))cmp_sell_orders);
 	
 	Order *t;
 	queue_get(q, (void **)&t);

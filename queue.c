@@ -303,6 +303,18 @@ queue_element_t *_sorted_merge(queue_element_t *a, queue_element_t *b,
 void _front_back_split(queue_element_t *source, queue_element_t **frontRef,
                        queue_element_t **backRef);
 
+void queue_sort(queue_t * q, int (*cmp)(void *, void *)) {
+	if( q->num_els < 2) return;
+	queue_merge_sort(&q->first_el, cmp);
+	queue_element_t * el_prev, *el = q->first_el;
+	while(el != NULL) {
+		el_prev = el;
+		el = el->next;
+	}
+	q->last_el = el_prev;
+	q->last_el->next = NULL;
+}
+
 void queue_merge_sort(queue_element_t **headRef, int (*cmp)(void *, void *)) {
     queue_element_t *head = *headRef;
     queue_element_t *a;
