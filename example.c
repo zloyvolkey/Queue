@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <queue.h>
+#include "queue.h"
 
 typedef struct {
 	char *test;
@@ -54,6 +54,61 @@ void unsorted_mode() {
 	free_test(t);
 	
 	queue_destroy_complete_test(q, free_test);
+}
+typedef struct { // O,<OID>,<Side>,<Qty>,<Price> заявка на покупку
+    unsigned int oid; // <OID> - уникальный идентификатор заявки (число)
+    char side;        // <Side> - покупка(B)/продажа(S)
+    unsigned int qty; // <Qty> - количество купить/продать. Целое числ
+    double price; // <Price> - цена покупки/продажи. Число с плавающей
+                  // точкой – максимум 2 знака после запятой
+} Order;
+
+int cmp_sell_orders(Order *a, Order *b) {
+    if (a->price < b->price)
+        return -1;
+    else if (a->price > b->price)
+        return 1;
+    else if (a->oid < b->oid)
+        return -1;
+    else
+        return 1;
+}
+
+void sorted_mode_merge() {
+	queue_t *q = queue_create();
+	
+	Order *t1 = (Order *)malloc(sizeof(Order));
+	Order *t2 = (Order *)malloc(sizeof(Order));
+	Order *t3 = (Order *)malloc(sizeof(Order));
+	Order *t4 = (Order *)malloc(sizeof(Order));
+	
+	t1->price = 3;
+	t2->price = 2;
+	t3->price = 4;
+	t4->price = 1;
+	
+	queue_put(q, t1);
+	queue_put(q, t2);
+	queue_put(q, t3);
+	queue_put(q, t4);
+
+	queue_merge_sort(&q->first_el,  (int (*)(void *, void *))cmp_sell_orders);
+	
+	Order *t;
+	queue_get(q, (void **)&t);
+	printf("first int %f\n", t->price);
+	free(t);
+	queue_get(q, (void **)&t);
+	printf("second int %f\n", t->price);
+	free(t);
+	queue_get(q, (void **)&t);
+	printf("third int %f\n", t->price);
+	free(t);
+	queue_get(q, (void **)&t);
+	printf("fourth int %f\n", t->price);
+	free(t);
+	
+	queue_destroy_complete(q, NULL);
 }
 
 void sorted_mode() {
@@ -121,9 +176,9 @@ void sorted2_mode() {
 }
 
 int main(int argc, char *argv[]) {
-	unsorted_mode();
-	sorted_mode();
-	sorted2_mode();
+	//unsorted_mode();
+	sorted_mode_merge();
+	//sorted2_mode();
 	
 	return 0;
 }

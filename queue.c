@@ -297,3 +297,82 @@ int8_t queue_flush_complete_put(queue_t *q, void (*ff)(void *), void *e) {
 		return Q_ERR_LOCK;
 	return r;
 }
+
+queue_element_t *_sorted_merge(queue_element_t *a, queue_element_t *b,
+                               int (*cmp)(void *, void *));
+void _front_back_split(queue_element_t *source, queue_element_t **frontRef,
+                       queue_element_t **backRef);
+
+void queue_merge_sort(queue_element_t **headRef, int (*cmp)(void *, void *)) {
+    queue_element_t *head = *headRef;
+    queue_element_t *a;
+    queue_element_t *b;
+
+    // Base case -- length 0 or 1
+    if ((head == NULL) || (head->next == NULL)) {
+        return;
+    }
+
+    // Split head into 'a' and 'b' sublists
+    _front_back_split(head, &a, &b);
+
+    // Recursively sort the sublists
+    queue_merge_sort(&a, cmp);
+    queue_merge_sort(&b, cmp);
+
+    /* answer = merge the two sorted
+       lists together */
+    *headRef = _sorted_merge(a, b, cmp);
+}
+
+queue_element_t *_sorted_merge(queue_element_t *a, queue_element_t *b,
+                               int (*cmp)(void *, void *)) {
+    queue_element_t *result = NULL;
+
+    // Base cases
+    if (a == NULL)
+        return (b);
+    else if (b == NULL)
+        return (a);
+
+    // Pick either a or b, and recur
+    if (cmp(a->data, b->data) < 0) {
+        result = a;
+        result->next = _sorted_merge(a->next, b, cmp);
+    } else {
+        result = b;
+        result->next = _sorted_merge(a, b->next, cmp);
+    }
+    return (result);
+}
+
+// UTILITY FUNCTIONS
+/* Split the nodes of the given list into
+   front and back halves, and return the
+   two lists using the reference parameters.
+   If the length is odd, the extra node should
+   go in the front list.Uses the fast/slow
+   pointer strategy. */
+void _front_back_split(queue_element_t *source, queue_element_t **frontRef,
+                       queue_element_t **backRef) {
+    queue_element_t *fast;
+    queue_element_t *slow;
+    slow = source;
+    fast = source->next;
+
+    /* Advance 'fast' two nodes, and
+       advance 'slow' one node */
+    while (fast != NULL) {
+        fast = fast->next;
+        if (fast != NULL) {
+            slow = slow->next;
+            fast = fast->next;
+        }
+    }
+
+    /* 'slow' is before the midpoint in the
+        list, so split it in two at that point. */
+    *frontRef = source;
+    *backRef = slow->next;
+    slow->next = NULL;
+}
